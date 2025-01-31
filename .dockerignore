@@ -1,0 +1,21 @@
+# Dev files
+.git/
+.github/
+tmp/
+.task/
+.air.toml
+.gitignore
+.dockerignore
+Dockerfile
+Taskfile.yml
+
+# Generated files
+components/*_templ.go
+node_modules/
+assets/css/
+assets/js/
+
+# Misc
+LICENSE
+README.md
+.DS_Store

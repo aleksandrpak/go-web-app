@@ -1,0 +1,80 @@
+version: "3"
+
+tasks:
+  init-assets:
+    cmds:
+      - npm install
+    sources:
+      - ./package.json
+      - ./package-lock.json
+    generates:
+      - ./node_modules/**/*.js
+      - ./node_modules/**/*.css
+
+  js:
+    deps: [init-assets]
+    cmds:
+      - npx esbuild --bundle --sourcemap --outfile=./assets/js/index.js ./assets/inputs/index.ts
+    sources:
+      - ./assets/inputs/index.ts
+    generates:
+      - ./assets/js/index.js
+
+  css:
+    deps: [js]
+    cmds:
+      - npx @tailwindcss/cli -i ./assets/inputs/input.css -o ./assets/css/output.css
+    sources:
+      - ./assets/inputs/input.css
+      - ./components/*.templ
+      - ./node_modules/**/*.css
+      - ./node_modules/**/*.html
+      - ./node_modules/**/*.js
+    generates:
+      - ./assets/css/output.css
+
+  templates:
+    cmds:
+      - templ generate
+    sources:
+      - ./components/*.templ
+    generates:
+      - ./components/*_templ.go
+
+  air-build:
+    deps: [css, templates]
+    cmds:
+      - go mod tidy
+      - go build -o ./tmp/main .
+    sources:
+      - ./main.go
+      - ./go.mod
+      - ./go.sum
+      - ./**/*.go
+    generates:
+      - ./tmp/main
+
+  air-run:
+    cmds:
+      - air
+
+  docker-build:
+    cmds:
+      - go mod tidy
+      - docker build -t alekspak/go-web-app:latest .
+
+  docker-run:
+    deps: [docker-build]
+    cmds:
+      - |
+        cleanup() {
+          docker stop go-web-app 2>/dev/null || true
+        }
+        trap cleanup EXIT
+
+        docker run --rm --name=go-web-app -p 3000:3000 -it alekspak/go-web-app:latest | sed 's/^/[go-web-app]: /'
+
+  docker-push:
+    deps: [docker-build]
+    cmds:
+      - docker push alekspak/go-web-app:latest

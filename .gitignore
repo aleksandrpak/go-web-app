@@ -24,5 +24,12 @@ go.work.sum
 # env file
 .env
 
-# Temporary files
+# Dev files
 tmp/
+.task/
+
+# Generated files
+node_modules/
+components/*_templ.go
+assets/css/
+assets/js/

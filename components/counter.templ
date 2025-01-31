@@ -1,8 +1,7 @@
-
 package components
 
 import "strconv"
 
 templ counter(count int) {
-	<div id="counter" class="font-medium">Counter: { strconv.Itoa(count) }</div>
+	<div id={ counterID } class="font-medium">Counter: { strconv.Itoa(count) }</div>
 }

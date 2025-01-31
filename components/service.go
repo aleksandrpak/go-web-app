@@ -4,10 +4,15 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog/log"
 )
 
 type Service struct {
 	count int
+}
+
+func NewService() *Service {
+	return &Service{}
 }
 
 func (s *Service) Routes() chi.Router {
@@ -18,7 +23,19 @@ func (s *Service) Routes() chi.Router {
 	return r
 }
 
+func (s *Service) Home(w http.ResponseWriter, r *http.Request) {
+	home().Render(r.Context(), w)
+}
+
 func (s *Service) counter(w http.ResponseWriter, r *http.Request) {
 	s.count++
-	counter(s.count).Render(r.Context(), w)
+
+	if s.count > 3 {
+		log.Error().Msg("Encountered error")
+
+		w.WriteHeader(http.StatusBadRequest)
+		errorToast("can't count anymore").Render(r.Context(), w)
+	} else {
+		counter(s.count).Render(r.Context(), w)
+	}
 }
