@@ -1,6 +1,7 @@
 package components
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -31,7 +32,7 @@ func (s *Service) counter(w http.ResponseWriter, r *http.Request) {
 	s.count++
 
 	if s.count > 3 {
-		log.Error().Msg("Encountered error")
+		log.Error().Err(fmt.Errorf("Unknown error")).Msg("Encountered error")
 
 		w.WriteHeader(http.StatusBadRequest)
 		errorToast("can't count anymore").Render(r.Context(), w)
